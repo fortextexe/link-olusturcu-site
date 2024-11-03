@@ -6,3 +6,5 @@ uploads Klasörü oluşturun izinleri 777 ayarlamanız gerekmektedir.
 ve bu kadar. 
 
 # Kötü amaçlı kullanmak teliftir. 
+
+demo: https://link-olusturcu-site.vercel.app/

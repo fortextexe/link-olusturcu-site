@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Yükleme ve Kısaltma</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #fileLink {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        .spinner {
+            display: none;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="https://durde.aksmm.com.tr/uploads/Photoroom-20241103_201530.png" alt="Logo" width="150">
+        <h1>Görselden Link Oluşturucu</h1>
+        <input type="file" id="fileInput" accept="image/*,video/*,.zip,.rar">
+        <div class="spinner" id="spinner"></div>
+        <button id="uploadButton">Yükle</button>
+        <input type="text" id="fileLink" placeholder="Kısaltılmış bağlantı" readonly>
+        <button id="copyButton" style="display:none;">Bağlantıyı Kopyala</button>
+        <button id="goButton" style="display:none;" onclick="window.open(fileLink.value, '_blank');">Linke Git</button>
+        <p style="margin-top: 20px;">© 2024 Fortextdev - <a href="https://fortextdev.xyz" style="color: #007bff;">Fortextdev</a></p>
+    </div>
+
+    <script>
+        const uploadButton = document.getElementById('uploadButton');
+        const fileInput = document.getElementById('fileInput');
+        const fileLink = document.getElementById('fileLink');
+        const spinner = document.getElementById('spinner');
+        const copyButton = document.getElementById('copyButton');
+        const goButton = document.getElementById('goButton');
+
+        uploadButton.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Lütfen bir dosya seçin!');
+                return;
+            }
+            spinner.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('upload.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fileLink.value = data.link;
+                    fileLink.style.display = 'block';
+                    copyButton.style.display = 'block';
+                    goButton.style.display = 'block';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                alert('Yükleme sırasında bir hata oluştu.');
+            })
+            .finally(() => {
+                spinner.style.display = 'none';
+            });
+        });
+
+        copyButton.addEventListener('click', () => {
+            fileLink.select();
+            document.execCommand('copy');
+            alert("Bağlantı kopyalandı!");
+        });
+    </script>
+</body>
+</html>
